@@ -7,8 +7,10 @@
 package neoism
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 
 	"gopkg.in/jmcvetta/napping.v3"
@@ -31,7 +33,7 @@ func WithClient(client *http.Client) option {
 // ConnectWithRetry()
 func Connect(uri string, options ...option) (*Database, error) {
 	h := http.Header{}
-	h.Add("User-Agent", "neoism")
+	h.Add("User-Agent", fmt.Sprintf("neoism/%s (%s)", VERSION, runtime.GOOS))
 	db := &Database{
 		Session: &napping.Session{
 			Header: &h,
