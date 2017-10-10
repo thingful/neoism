@@ -5,9 +5,10 @@
 package neoism
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // 18.5.1. Get Relationship by ID
@@ -75,7 +76,7 @@ func TestDeleteRelationship(t *testing.T) {
 		t.Error(err)
 	}
 	// Delete and confirm
-	r0.Delete()
+	_ = r0.Delete()
 	_, err = db.Relationship(r0.Id())
 	assert.Equal(t, err, NotFound, "Should not be able to Get() a deleted relationship.")
 }
@@ -109,7 +110,7 @@ func TestSetAllPropertiesOnRelationship(t *testing.T) {
 	n1, _ := db.CreateNode(Props{})
 	r0, _ := n0.Relate("knows", n1.Id(), props0)
 	// Set all properties
-	r0.SetProperties(props1)
+	_ = r0.SetProperties(props1)
 	// Confirm
 	checkProps, _ := r0.Properties()
 	assert.Equal(t, checkProps, props1, "Failed to set all properties on relationship")
@@ -141,7 +142,7 @@ func TestSetSinglePropertyOnRelationship(t *testing.T) {
 	n1, _ := db.CreateNode(Props{})
 	r0, _ := n0.Relate("knows", n1.Id(), Props{})
 	// Set property
-	r0.SetProperty("foo", "bar")
+	_ = r0.SetProperty("foo", "bar")
 	// Confirm
 	expected := Props{"foo": "bar"}
 	props, _ := r0.Properties()
@@ -177,9 +178,11 @@ func TestGetIncomingRelationships(t *testing.T) {
 	// Create
 	n0, _ := db.CreateNode(Props{})
 	n1, _ := db.CreateNode(Props{})
-	n0.Relate("knows", n1.Id(), Props{})
+	_, err := n0.Relate("knows", n1.Id(), Props{})
+	assert.Nil(t, err)
 	r1, _ := n1.Relate("knows", n0.Id(), Props{})
-	n0.Relate("knows", n1.Id(), Props{})
+	_, err = n0.Relate("knows", n1.Id(), Props{})
+	assert.Nil(t, err)
 	// Check relationships
 	rels, err := n0.Incoming()
 	if err != nil {
@@ -198,7 +201,7 @@ func TestGetOutgoingRelationships(t *testing.T) {
 	n0, _ := db.CreateNode(Props{})
 	n1, _ := db.CreateNode(Props{})
 	r0, _ := n0.Relate("knows", n1.Id(), Props{})
-	n1.Relate("knows", n0.Id(), Props{})
+	_, _ = n1.Relate("knows", n0.Id(), Props{})
 	r2, _ := n0.Relate("knows", n1.Id(), Props{})
 	// Check relationships
 	rels, err := n0.Outgoing()

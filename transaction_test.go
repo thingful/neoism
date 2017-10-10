@@ -6,9 +6,10 @@ package neoism
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type resStruct0 struct {
@@ -64,10 +65,9 @@ func TestTxBegin(t *testing.T) {
 	assert.Equal(t, *new([]string), q1.Columns())
 	stmts := []*CypherQuery{&q0, &q1, &q2}
 	tx, err := db.Begin(stmts)
-	tx.Rollback()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
+	err = tx.Rollback()
+	assert.Nil(t, err)
 	assert.Equal(t, 1, len(res0))
 	assert.Equal(t, "James T Kirk", res0[0].N.Name)
 	assert.Equal(t, 1, len(res1))
@@ -146,7 +146,7 @@ func TestTxBadResultObj(t *testing.T) {
 	if _, ok := err.(*json.UnmarshalTypeError); !ok {
 		t.Fatal(err)
 	}
-	tx.Rollback() // Else cleanup will hang til Tx times out
+	_ = tx.Rollback() // Else cleanup will hang til Tx times out
 }
 
 func TestTxBadQuery(t *testing.T) {
@@ -167,7 +167,7 @@ func TestTxBadQuery(t *testing.T) {
 		},
 	}
 	tx, err := db.Begin(qs)
-	tx.Rollback() // Else cleanup will hang til Tx times out
+	_ = tx.Rollback() // Else cleanup will hang til Tx times out
 	assert.Equal(t, TxQueryError, err)
 	numErr := len(tx.Errors)
 	assert.True(t, numErr == 1, "Expected one tx error, got "+strconv.Itoa(numErr))
@@ -271,7 +271,7 @@ func TestTxQueryBad(t *testing.T) {
 	}
 	err = tx.Query(qs1)
 	assert.Equal(t, TxQueryError, err)
-	tx.Rollback() // Else cleanup will hang til Tx times out
+	_ = tx.Rollback() // Else cleanup will hang til Tx times out
 }
 
 func TestTxBeginStats(t *testing.T) {

@@ -6,9 +6,10 @@ package neoism
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // 18.3.1. Send queries with parameters
@@ -25,15 +26,15 @@ func TestCypherParameters(t *testing.T) {
 	numIdx, _ := db.CreateLegacyNodeIndex("num_index", "", "")
 	defer numIdx.Delete()
 	n0, _ := db.CreateNode(Props{"name": "I"})
-	nameIdx.Add(n0, "name", "I")
+	_ = nameIdx.Add(n0, "name", "I")
 	n1, _ := db.CreateNode(Props{"name": "you"})
 	n2, _ := db.CreateNode(Props{"name": "num", "num": 42})
-	numIdx.Add(n2, "num", 42)
+	_ = numIdx.Add(n2, "num", 42)
 	n3, _ := db.CreateNode(Props{"name": "float", "float": 3.14})
-	floatIdx.Add(n3, "float", 3.14)
+	_ = floatIdx.Add(n3, "float", 3.14)
 	r0, _ := n0.Relate("knows", n1.Id(), nil)
 	r1, _ := n0.Relate("loves", n1.Id(), nil)
-	n0.Relate("understands", n2.Id(), nil)
+	_, _ = n0.Relate("understands", n2.Id(), nil)
 	//
 	// Query with string parameters and integer results
 	//
@@ -154,9 +155,9 @@ func TestCypher(t *testing.T) {
 	idx0, _ := db.CreateLegacyNodeIndex("name_index", "", "")
 	defer idx0.Delete()
 	n0, _ := db.CreateNode(Props{"name": "I"})
-	idx0.Add(n0, "name", "I")
+	_ = idx0.Add(n0, "name", "I")
 	n1, _ := db.CreateNode(Props{"name": "you", "age": 69})
-	n0.Relate("know", n1.Id(), nil)
+	_, _ = n0.Relate("know", n1.Id(), nil)
 	// Query
 	// query := "START x = node:name_index(name=I) MATCH path = (x-[r]-friend) WHERE friend.name = you RETURN TYPE(r)"
 	type resultStruct struct {
@@ -197,9 +198,9 @@ func TestCypherComment(t *testing.T) {
 	idx0, _ := db.CreateLegacyNodeIndex("name_index", "", "")
 	defer idx0.Delete()
 	n0, _ := db.CreateNode(Props{"name": "I"})
-	idx0.Add(n0, "name", "I")
+	_ = idx0.Add(n0, "name", "I")
 	n1, _ := db.CreateNode(Props{"name": "you", "age": 69})
-	n0.Relate("know", n1.Id(), nil)
+	_, _ = n0.Relate("know", n1.Id(), nil)
 	// Query
 	// query := "START x = node:name_index(name=I) MATCH path = (x-[r]-friend) WHERE friend.name = you RETURN TYPE(r)"
 	type resultStruct struct {

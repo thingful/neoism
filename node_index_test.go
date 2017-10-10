@@ -6,9 +6,10 @@ package neoism
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // 18.9.1. Create node index
@@ -137,7 +138,7 @@ func TestRemoveNodeFromIndex(t *testing.T) {
 	defer idx0.Delete()
 	n0, _ := db.CreateNode(Props{})
 	defer n0.Delete()
-	idx0.Add(n0, key, value)
+	_ = idx0.Add(n0, key, value)
 	err := idx0.Remove(n0, "", "")
 	if err != nil {
 		t.Error(err)
@@ -154,11 +155,10 @@ func TestRemoveNodeAndKeyFromIndex(t *testing.T) {
 	defer idx0.Delete()
 	n0, _ := db.CreateNode(Props{})
 	defer n0.Delete()
-	idx0.Add(n0, key, value)
-	err := idx0.Remove(n0, key, "")
-	if err != nil {
-		t.Error(err)
-	}
+	err := idx0.Add(n0, key, value)
+	assert.Nil(t, err)
+	err = idx0.Remove(n0, key, "")
+	assert.Nil(t, err)
 }
 
 // 18.9.8. Remove all entries with a given node, key and value from an index
@@ -171,11 +171,10 @@ func TestRemoveNodeKeyAndValueFromIndex(t *testing.T) {
 	defer idx0.Delete()
 	n0, _ := db.CreateNode(Props{})
 	defer n0.Delete()
-	idx0.Add(n0, key, value)
-	err := idx0.Remove(n0, key, "")
-	if err != nil {
-		t.Error(err)
-	}
+	err := idx0.Add(n0, key, value)
+	assert.Nil(t, err)
+	err = idx0.Remove(n0, key, "")
+	assert.Nil(t, err)
 }
 
 // 18.9.9. Find node by exact match
@@ -194,11 +193,11 @@ func TestFindNodeByExactMatch(t *testing.T) {
 	n1, _ := db.CreateNode(Props{})
 	n2, _ := db.CreateNode(Props{})
 	// These two will be located by Find() below
-	idx0.Add(n0, key0, value0)
-	idx0.Add(n1, key0, value0)
+	_ = idx0.Add(n0, key0, value0)
+	_ = idx0.Add(n1, key0, value0)
 	// These two will NOT be located by Find() below
-	idx0.Add(n2, key1, value0)
-	idx0.Add(n2, key0, value1)
+	_ = idx0.Add(n2, key1, value0)
+	_ = idx0.Add(n2, key0, value1)
 	//
 	nodes, err := idx0.Find(key0, value0)
 	if err != nil {
@@ -224,12 +223,12 @@ func TestFindNodeByQuery(t *testing.T) {
 	value0 := rndStr(t)
 	value1 := rndStr(t)
 	n0, _ := db.CreateNode(Props{})
-	idx0.Add(n0, key0, value0)
-	idx0.Add(n0, key1, value1)
+	_ = idx0.Add(n0, key0, value0)
+	_ = idx0.Add(n0, key1, value1)
 	n1, _ := db.CreateNode(Props{})
-	idx0.Add(n1, key0, value0)
+	_ = idx0.Add(n1, key0, value0)
 	n2, _ := db.CreateNode(Props{})
-	idx0.Add(n2, rndStr(t), rndStr(t))
+	_ = idx0.Add(n2, rndStr(t), rndStr(t))
 	// Retrieve
 	luceneQuery0 := fmt.Sprintf("%v:%v AND %v:%v", key0, value0, key1, value1) // Retrieve n0 only
 	luceneQuery1 := fmt.Sprintf("%v:%v", key0, value0)                         // Retrieve n0 and n1
