@@ -4,7 +4,9 @@
 
 package neoism
 
-import "testing"
+import (
+	"testing"
+)
 
 func benchCleanup(b *testing.B, db *Database) {
 	qs := []*CypherQuery{
@@ -123,7 +125,7 @@ func nodeChainTx(b *testing.B, chainLength int) {
 	b.StopTimer()
 	db := connectBench(b)
 	defer benchCleanup(b, db)
-	db.CreateIndex("Person", "name")
+	_, _ = db.CreateIndex("Person", "name")
 	b.StartTimer()
 	for cnt := 0; cnt < b.N; cnt++ {
 		qs := []*CypherQuery{}
@@ -166,7 +168,7 @@ func nodeChainTx(b *testing.B, chainLength int) {
 		qs = append(qs, &cq1)
 		tx, err := db.Begin(qs)
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			logPretty(err)
 			b.Fatal(err)
 		}

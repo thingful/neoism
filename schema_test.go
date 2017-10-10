@@ -17,9 +17,9 @@ import (
 func TestCreateIndex(t *testing.T) {
 	db := connectTest(t)
 	defer cleanup(t, db)
-	defer cleanupIndexes(t, db)
-	label := rndStr(t)
-	prop0 := rndStr(t)
+	//defer cleanupIndexes(t, db)
+	label := "label"
+	prop0 := "prop"
 	idx, err := db.CreateIndex(label, prop0)
 	if err != nil {
 		t.Fatal(err)
@@ -28,16 +28,20 @@ func TestCreateIndex(t *testing.T) {
 	assert.Equal(t, prop0, idx.PropertyKeys[0])
 	_, err = db.CreateIndex("", "")
 	assert.Equal(t, NotAllowed, err)
+	err = idx.Drop()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestIndexes(t *testing.T) {
 	db := connectTest(t)
 	defer cleanup(t, db)
 	defer cleanupIndexes(t, db)
-	label0 := rndStr(t)
-	label1 := rndStr(t)
-	prop0 := rndStr(t)
-	prop1 := rndStr(t)
+	label0 := "label0"
+	label1 := "label1"
+	prop0 := "prop0"
+	prop1 := "prop1"
 	indexes0, err := db.Indexes(label0)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, 0, len(indexes0))
@@ -79,16 +83,17 @@ func cleanupIndexes(t *testing.T, db *Database) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	qs := make([]*CypherQuery, len(indexes))
-	for i, idx := range indexes {
+	qs := []*CypherQuery{}
+	for _, idx := range indexes {
 		// Cypher doesn't support properties in DROP statements
 		l := idx.Label
-		p := idx.PropertyKeys[0]
-		stmt := fmt.Sprintf("DROP INDEX ON :%s(%s)", l, p)
-		cq := CypherQuery{
-			Statement: stmt,
+		for _, p := range idx.PropertyKeys {
+			stmt := fmt.Sprintf("DROP INDEX ON :%s(%s)", l, p)
+			cq := CypherQuery{
+				Statement: stmt,
+			}
+			qs = append(qs, &cq)
 		}
-		qs[i] = &cq
 	}
 	// db.Rc.Log = true
 	err = db.CypherBatch(qs)
@@ -121,7 +126,7 @@ func TestCreateUniqueConstraints(t *testing.T) {
 	// Try to violate the constraint
 	// Create the first node
 	n0, _ := db.CreateNode(Props{prop0: value0})
-	n0.AddLabel(label0)
+	_ = n0.AddLabel(label0)
 	// Add Label on existing node
 	n1, err := db.CreateNode(Props{prop0: value0})
 	assert.Equal(t, nil, err)

@@ -9,9 +9,10 @@
 package neoism
 
 import (
+	"testing"
+
 	"github.com/jmcvetta/randutil"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // 18.4.1. Create Node
@@ -176,7 +177,7 @@ func TestDeleteNodeWithRelationships(t *testing.T) {
 	// Create
 	n0, _ := db.CreateNode(Props{})
 	n1, _ := db.CreateNode(Props{})
-	n0.Relate("knows", n1.Id(), Props{})
+	_, _ = n0.Relate("knows", n1.Id(), Props{})
 	// Attempt to delete node without deleting relationship
 	err := n0.Delete()
 	assert.Equal(t, err, CannotDelete, "Should not be possible to delete node with relationship.")
@@ -280,7 +281,8 @@ func TestDeleteAllPropertiesFromNode(t *testing.T) {
 	// Confirm deletion
 	checkProps, _ := n0.Properties()
 	assert.Equal(t, Props{}, checkProps, "Properties should be empty after call to DeleteProperties()")
-	n0.Delete()
+	err = n0.Delete()
+	assert.Nil(t, err)
 	err = n0.DeleteProperties()
 	assert.Equal(t, NotFound, err)
 }
@@ -309,7 +311,8 @@ func TestDeleteNamedPropertyFromNode(t *testing.T) {
 	//
 	// Delete and check 404
 	//
-	n0.Delete()
+	err = n0.Delete()
+	assert.Nil(t, err)
 	err = n0.DeleteProperty("spam")
 	assert.Equal(t, NotFound, err)
 }
@@ -320,14 +323,13 @@ func TestNodeProperty(t *testing.T) {
 	props := Props{"foo": "bar"}
 	n0, _ := db.CreateNode(props)
 	value, err := n0.Property("foo")
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Nil(t, err)
 	assert.Equal(t, value, "bar", "Incorrect value when getting single property.")
 	//
 	// Check Not Found
 	//
-	n0.Delete()
+	err = n0.Delete()
+	assert.Nil(t, err)
 	_, err = n0.Property("foo")
 	assert.Equal(t, NotFound, err)
 }
@@ -357,7 +359,7 @@ func TestLabelsInvalidNode(t *testing.T) {
 	db := connectTest(t)
 	defer cleanup(t, db)
 	n0, _ := db.CreateNode(nil)
-	n0.Delete()
+	_ = n0.Delete()
 	err := n0.AddLabel("foobar")
 	assert.Equal(t, NotFound, err)
 	_, err = n0.Labels()
@@ -368,16 +370,15 @@ func TestRemoveLabel(t *testing.T) {
 	db := connectTest(t)
 	defer cleanup(t, db)
 	n0, _ := db.CreateNode(nil)
-	n0.AddLabel("foobar")
+	err := n0.AddLabel("foobar")
+	assert.Nil(t, err)
 	labels, _ := n0.Labels()
 	assert.Equal(t, []string{"foobar"}, labels)
-	err := n0.RemoveLabel("foobar")
-	if err != nil {
-		t.Fatal(err)
-	}
+	err = n0.RemoveLabel("foobar")
+	assert.Nil(t, err)
 	labels, _ = n0.Labels()
 	assert.Equal(t, []string{}, labels)
-	n0.Delete()
+	_ = n0.Delete()
 	err = n0.RemoveLabel("foobar")
 	assert.Equal(t, NotFound, err)
 
@@ -397,14 +398,14 @@ func TestSetLabels(t *testing.T) {
 	db := connectTest(t)
 	defer cleanup(t, db)
 	n0, _ := db.CreateNode(nil)
-	n0.AddLabel("spam", "eggs")
+	_ = n0.AddLabel("spam", "eggs")
 	err := n0.SetLabels([]string{"foobar"})
 	if err != nil {
 		t.Fatal(err)
 	}
 	labels, _ := n0.Labels()
 	assert.Equal(t, []string{"foobar"}, labels)
-	n0.Delete()
+	_ = n0.Delete()
 	err = n0.SetLabels([]string{"foobar"})
 	assert.Equal(t, NotFound, err)
 }
@@ -419,7 +420,10 @@ func TestNodesByLabel(t *testing.T) {
 	}
 	assert.Equal(t, 0, len(nodes))
 	n0, _ := db.CreateNode(nil)
-	n0.AddLabel("foobar")
+	err = n0.AddLabel("foobar")
+	if err != nil {
+		t.Fatal(err)
+	}
 	nodes, err = db.NodesByLabel("foobar")
 	if err != nil {
 		t.Fatal(err)
@@ -433,7 +437,7 @@ func TestGetAllLabels(t *testing.T) {
 	defer cleanup(t, db)
 	rndLabel := rndStr(t)
 	n0, _ := db.CreateNode(nil)
-	n0.AddLabel(rndLabel)
+	_ = n0.AddLabel(rndLabel)
 	labels, err := db.Labels()
 	if err != nil {
 		t.Fatal(err)

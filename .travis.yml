@@ -1,5 +1,5 @@
 language: go
-go: 
+go:
   - 1.1
   - 1.2
   - 1.3
@@ -8,6 +8,7 @@ go:
   - 1.6
   - 1.7
   - 1.8
+  - 1.9
   - tip
 notificaitons:
   email:
@@ -27,7 +28,7 @@ before_install:
 
 env:
   global:
-    - NEO4J_VERSION="2.2.5"
+    - NEO4J_VERSION="3.2.5"
     - NEO4J_URL=http://neo4j:foobar@localhost:7474/db/data/
 
 script:
