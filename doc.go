@@ -14,7 +14,7 @@ Example Usage:
 
 	import (
 		"fmt"
-		"github.com/jmcvetta/neoism"
+		"github.com/thingful/neoism"
 	)
 
 	func main() {
@@ -100,6 +100,6 @@ package neoism
 
 // Imports required for tests - so they work with "go get".
 import (
-	_ "github.com/stretchr/testify/assert"
 	_ "github.com/jmcvetta/randutil"
+	_ "github.com/stretchr/testify/assert"
 )
