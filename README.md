@@ -23,9 +23,9 @@ YMMV; use in production at your own risk.
 
 # Requirements
 
-[Go 1.1](http://golang.org/doc/go1.1) or later is required.
+[Go 1.3](http://golang.org/doc/go1.13 or later is required.
 
-Tested against Neo4j 2.2.4 and Go 1.4.1.
+Tested against Neo4j 3.1.0, 3.2.5 and Go 1.9.
 
 
 # Installation
@@ -49,6 +49,16 @@ generated documentation.
 
 ```go
 db, err := neoism.Connect("http://localhost:7474/db/data")
+```
+
+## Connect to Neo4j Database with custom client
+
+```go
+client := &http.Client{
+  Timeout: time.Second * 10,
+}
+
+db, err := neoism.Connect("http://localhost:7474/db/data", WithClient(client))
 ```
 
 ## Create a Node
